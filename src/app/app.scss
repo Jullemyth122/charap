@@ -1,0 +1,8 @@
+// app.scss — Component-scoped styles only.
+// All design tokens, layout, and shared styles live in src/styles.scss (global).
+// This file stays minimal to respect Angular's anyComponentStyle budget.
+
+:host {
+  display: block;
+  height: 100%;
+}
