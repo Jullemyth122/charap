@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+// ─── Active Timers ───────────────────────────────────────────
+
+.timers-card {
+  padding: 16px 18px;
+  flex-shrink: 0;
+}
+
+.timer-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff8c42;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.timers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.timer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-radius: 13px;
+  border: 1px solid;
+  transition: all 0.2s ease;
+
+  &.timer-item-dark {
+    background: rgba(255, 140, 66, 0.04);
+    border-color: rgba(255, 140, 66, 0.09);
+  }
+  &.timer-item-light {
+    background: rgba(255, 240, 220, 0.7);
+    border-color: rgba(200, 120, 40, 0.18);
+  }
+  &.timer-item-done {
+    border-color: rgba(239, 68, 68, 0.35) !important;
+    background: rgba(127, 29, 29, 0.07) !important;
+  }
+}
+
+.timer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.timer-name {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #9ca3af;
+
+  &.timer-name-done {
+    color: #f87171;
+  }
+}
+
+.timer-countdown {
+  font-size: 22px;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+.timer-running-dark {
+  color: #ffb347;
+}
+.timer-running-light {
+  color: #c45a10;
+}
+.timer-done-blink {
+  color: #ef4444;
+  animation: bounce-alt 0.5s ease-in-out infinite alternate;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-track {
+  width: 52px;
+  height: 4px;
+  border-radius: 99px;
+  overflow: hidden;
+
+  &.timer-track-dark {
+    background: rgba(255, 140, 66, 0.1);
+  }
+  &.timer-track-light {
+    background: rgba(200, 120, 40, 0.15);
+  }
+}
+
+.timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff8c42, #ffd08a);
+  border-radius: 99px;
+  transition: width 1s linear;
+
+  &.timer-fill-done {
+    background: #ef4444;
+  }
+}
+
+.timer-del {
+  padding: 5px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.timer-del-dark {
+    background: transparent;
+    color: #6b7280;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+    }
+  }
+  &.timer-del-light {
+    background: transparent;
+    color: #9ca3af;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.08);
+      color: #dc2626;
+    }
+  }
+}

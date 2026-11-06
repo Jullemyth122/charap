@@ -1,0 +1,60 @@
+@if (timers().length > 0) {
+  <div class="card timers-card" [ngClass]="isDarkMode() ? 'card-dark' : 'card-light'">
+    <h3
+      class="section-label flex-label"
+      [ngClass]="isDarkMode() ? 'section-label-dark' : 'section-label-light'"
+    >
+      <span class="timer-pulse-dot"></span>
+      Active Timers
+    </h3>
+    <div class="timers-grid">
+      @for (t of timers(); track t.id) {
+        <div
+          class="timer-item"
+          [ngClass]="{
+            'timer-item-dark': isDarkMode(),
+            'timer-item-light': !isDarkMode(),
+            'timer-item-done': t.duration <= 0,
+          }"
+        >
+          <div class="timer-info">
+            <span class="timer-name" [ngClass]="{ 'timer-name-done': t.duration <= 0 }">{{
+              t.label
+            }}</span>
+            <span
+              class="timer-countdown"
+              [ngClass]="{
+                'timer-done-blink': t.duration <= 0,
+                'timer-running-dark': t.duration > 0 && isDarkMode(),
+                'timer-running-light': t.duration > 0 && !isDarkMode(),
+              }"
+            >
+              {{ formatTime(t.duration) }}
+            </span>
+          </div>
+
+          <div class="timer-controls">
+            <div
+              class="timer-track"
+              [ngClass]="isDarkMode() ? 'timer-track-dark' : 'timer-track-light'"
+            >
+              <div
+                class="timer-fill"
+                [style.width.%]="(t.duration / t.max) * 100"
+                [ngClass]="{ 'timer-fill-done': t.duration <= 0 }"
+              ></div>
+            </div>
+
+            <button
+              (click)="deleteTimer.emit(t.id)"
+              class="timer-del"
+              [ngClass]="isDarkMode() ? 'timer-del-dark' : 'timer-del-light'"
+            >
+              <app-icon name="close" class="icon-xs"></app-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

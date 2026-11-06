@@ -1,0 +1,88 @@
+<div class="card voice-card" [ngClass]="isDarkMode() ? 'card-dark' : 'card-light'">
+  <div class="voice-card-inner">
+    <!-- Mic visual orb -->
+    <div class="mic-orb-wrap">
+      <div class="mic-orb-ring" [ngClass]="{ 'mic-orb-active': isRecording() }"></div>
+      <button
+        (click)="toggleRecording.emit()"
+        class="mic-orb"
+        [ngClass]="{
+          'mic-orb-recording': isRecording(),
+          'mic-orb-locked': isBusy() && !isRecording(),
+        }"
+        [disabled]="isBusy() && !isRecording()"
+        [title]="
+          isBusy()
+            ? 'Please wait — AI is responding…'
+            : isRecording()
+              ? 'Stop recording'
+              : 'Tap to speak'
+        "
+        id="mic-record-btn"
+      >
+        @if (isRecording()) {
+          <span class="orb-pulse"></span>
+        }
+        <app-icon name="mic" class="mic-icon-lg"></app-icon>
+      </button>
+    </div>
+
+    <!-- Status text -->
+    <div class="mic-status-block">
+      <p
+        class="mic-status-text"
+        [ngClass]="
+          isRecording()
+            ? 'mic-status-active'
+            : isDarkMode()
+              ? 'mic-status-idle-dark'
+              : 'mic-status-idle-light'
+        "
+      >
+        {{ isRecording() ? '● Recording...' : isBusy() ? 'AI is thinking…' : 'Tap to speak' }}
+      </p>
+
+      <!-- Waveform -->
+      <div
+        class="waveform-strip"
+        [ngClass]="isDarkMode() ? 'waveform-strip-dark' : 'waveform-strip-light'"
+      >
+        @if (isRecording() && visualizerData()) {
+          <svg viewBox="0 0 300 40" class="wave-svg">
+            <polyline
+              fill="none"
+              stroke="url(#waveG)"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [attr.points]="getWaveformPoints()"
+            />
+            <defs>
+              <linearGradient id="waveG" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#FF6B35" />
+                <stop offset="50%" stop-color="#FFB347" />
+                <stop offset="100%" stop-color="#FF8C42" />
+              </linearGradient>
+            </defs>
+          </svg>
+        } @else {
+          <div
+            class="wave-bars-idle"
+            [ngClass]="isDarkMode() ? 'wave-idle-dark' : 'wave-idle-light'"
+          >
+            <span class="wb wb-s"></span>
+            <span class="wb wb-m"></span>
+            <span class="wb wb-xs"></span>
+            <span class="wb wb-l"></span>
+            <span class="wb wb-s"></span>
+            <span class="wb wb-m"></span>
+            <span class="wb wb-xs"></span>
+            <span class="wb wb-l"></span>
+            <span class="wb wb-s"></span>
+            <span class="wb wb-m"></span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

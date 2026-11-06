@@ -1,17 +1,111 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Charap — Your AI Kitchen</title>
-  <meta name="description" content="Charap is your AI-powered kitchen companion. Ask for recipes, set cooking timers, and get step-by-step guidance — all with voice or text.">
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+  <head>
+    <meta charset="utf-8" />
+
+    <!-- Primary SEO -->
+    <title>Charap — AI Chef Assistant & Smart Cooking Guide</title>
+    <meta
+      name="description"
+      content="Charap is your personal AI-powered chef assistant. Get instant recipes, detailed step-by-step cooking guides, nutritional breakdowns, and hands-free voice control — all in one smart kitchen companion."
+    />
+    <meta
+      name="keywords"
+      content="AI chef assistant, AI cooking guide, recipe AI, smart kitchen, cooking chatbot, step-by-step recipes, nutritional information, voice cooking assistant, Charap, food AI, meal planning, cooking tips, chef guide, ingredient nutrition, Gemini AI chef"
+    />
+    <meta name="author" content="Charap" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#FF8C42" />
+
+    <!-- Viewport & Base -->
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Charap" />
+    <meta property="og:title" content="Charap — AI Chef Assistant & Smart Cooking Guide" />
+    <meta
+      property="og:description"
+      content="Your personal AI-powered chef. Ask about any dish, get full nutritional data, step-by-step cooking guides, and set kitchen timers — all by voice or text."
+    />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Charap AI Chef Assistant logo" />
+    <meta property="og:url" content="https://charap.app" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Charap — AI Chef Assistant & Smart Cooking Guide" />
+    <meta
+      name="twitter:description"
+      content="Your personal AI-powered chef. Ask about any dish, get full nutritional data, step-by-step cooking guides, and set kitchen timers — all by voice or text."
+    />
+    <meta name="twitter:image" content="/icon-512.png" />
+    <meta name="twitter:image:alt" content="Charap AI Chef Assistant" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <!-- iOS Full-Screen PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Charap" />
+
+    <!-- Favicons & Touch Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://charap.app" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Charap",
+        "description": "AI-powered chef assistant that provides recipes, step-by-step cooking guides, nutritional analysis, and voice-activated kitchen timers.",
+        "url": "https://charap.app",
+        "applicationCategory": "FoodApplication",
+        "operatingSystem": "Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "AI recipe generation",
+          "Nutritional breakdown by ingredient",
+          "Step-by-step cooking instructions",
+          "Voice recognition input",
+          "Kitchen timer integration",
+          "Dark and light mode support"
+        ],
+        "author": {
+          "@type": "Organization",
+          "name": "Charap"
+        }
+      }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <app-root></app-root>
+    <!-- Google Identity Services (GSI) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </body>
 </html>

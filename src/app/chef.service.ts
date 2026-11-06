@@ -1,11 +1,41 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { AuthService } from './services/auth.service';
+
+export interface ElementComposition {
+  element: string;
+  symbol?: string;
+  amount?: string;
+  note?: string;
+}
+
+export interface NutrientDetails {
+  // Common macros for optional autocomplete (optional)
+  calories?: string;
+  protein?: string;
+  carbs?: string;
+  fat?: string;
+
+  // Non-string nested structures
+  elements?: ElementComposition[];
+  phytochemicals?: string[];
+
+  // Accepts any key-value pairs passed down dynamically by backend
+  [key: string]: any;
+}
+export interface Ingredient {
+  name: string;
+  amount: string;
+  notes?: string;
+  substitutions?: string[];
+  nutrients?: NutrientDetails;
+}
 
 export interface Recipe {
   title: string;
   description: string;
-  ingredients: string[];
+  ingredients: Ingredient[];
   steps: string[];
+  totalNutrients?: NutrientDetails;
 }
 
 export interface ChefResponse {
@@ -15,97 +45,69 @@ export interface ChefResponse {
   recipe?: Recipe;
 }
 
-const SYSTEM_PROMPT = `You are Charap, a brilliant and friendly AI kitchen assistant. You know every cuisine in the world — Filipino, Italian, Japanese, Mexican, French, and more. You give real, accurate, detailed recipes.
-
-When a user asks for a recipe or how to cook something, you MUST respond with a JSON object in this EXACT format (no markdown fences, raw JSON only):
-{
-  "text": "A warm, enthusiastic chat message describing the dish. Use **bold** for key terms.",
-  "recipe": {
-    "title": "Exact dish name",
-    "description": "One sentence description of the dish.",
-    "ingredients": ["ingredient 1 with quantity", "ingredient 2 with quantity", "..."],
-    "steps": ["Step 1: ...", "Step 2: ...", "Step 3: ...", "..."]
-  }
-}
-
-When a user asks to set a timer (e.g. "set a timer for 5 minutes"), respond with:
-{
-  "text": "A confirming message about the timer.",
-  "timerDuration": <number of seconds>,
-  "timerLabel": "Short label like '5 Min Timer'"
-}
-
-For general cooking questions, tips, or conversation that does NOT need a recipe or timer, respond with:
-{
-  "text": "Your detailed, helpful answer. Use **bold** for key terms."
-}
-
-IMPORTANT RULES:
-- Always output valid raw JSON — never wrap in markdown code fences or backticks
-- Ingredients must be specific with real quantities (e.g. "500g pork belly, sliced" not "some pork")
-- Steps must be detailed, numbered instructions (at least 4 steps, ideally 5-7)
-- recipe.title must be the real dish name (e.g. "Paksiw na Isda", not "Dynamic Paksiw na Isda")
-- Do NOT say "Chef Julle Myth" anywhere — you are Charap
-- Be warm, energetic and knowledgeable. Use food emojis sparingly.`;
-
 @Injectable({
   providedIn: 'root',
 })
 export class ChefService {
-  private readonly apiKey = environment.geminiApiKey;
-  private readonly apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`;
+  private authService = inject(AuthService);
 
   // Conversation history for multi-turn context
   private conversationHistory: Array<{ role: string; parts: Array<{ text: string }> }> = [];
 
   /**
-   * Sends a user query to Gemini 2.5 Flash and returns a structured ChefResponse.
-   * Timer commands are parsed locally first for instant feedback.
+   * Sends a user query to the Vercel serverless /api/chat endpoint.
+   * All AI logic, system prompts, and API keys live server-side.
    */
   async getResponse(query: string): Promise<ChefResponse> {
     const cleanQuery = query.toLowerCase().trim();
 
-    // Fast-path: parse timer requests locally (no AI needed)
+    // Fast-path: parse timer requests locally (no AI round-trip needed)
     const timerResponse = this.parseTimerRequest(cleanQuery);
     if (timerResponse) {
       return timerResponse;
     }
 
-    // Add user message to history
+    // Add user message to history before the request
     this.conversationHistory.push({
       role: 'user',
       parts: [{ text: query }],
     });
 
     try {
-      const requestBody = {
-        system_instruction: {
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        contents: this.conversationHistory,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-          responseMimeType: 'text/plain',
-        },
-      };
-
-      const response = await fetch(this.apiUrl, {
+      const authHeaders = this.authService.getAuthHeaders();
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders,
+        },
+        body: JSON.stringify({
+          prompt: query,
+          history: this.conversationHistory,
+        }),
       });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error('Gemini API error:', errText);
-        throw new Error(`Gemini API returned ${response.status}`);
+      const contentType = res.headers.get('content-type') || '';
+
+      // Handle rate limiting
+      if (res.status === 429 && contentType.includes('application/json')) {
+        const limitErr = await res.json();
+        this.conversationHistory.pop();
+        return {
+          text: `⏱️ **Rate Limit Reached**: ${limitErr.error || 'You have exceeded the query limit.'} Please sign in or try again later!`,
+        };
       }
 
-      const data = await response.json();
-      const rawText: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error('API chat error:', errText);
+        throw new Error(`Server returned ${res.status}`);
+      }
 
-      // Add assistant response to history for context
+      const data = await res.json();
+      const rawText: string = data.response ?? '';
+
+      // Add assistant response to history for multi-turn context
       this.conversationHistory.push({
         role: 'model',
         parts: [{ text: rawText }],
@@ -116,9 +118,9 @@ export class ChefService {
         this.conversationHistory = this.conversationHistory.slice(-20);
       }
 
-      return this.parseGeminiResponse(rawText, query);
+      return this.parseChefResponse(rawText);
     } catch (err: any) {
-      console.error('Error calling Gemini:', err);
+      console.error('Error calling /api/chat:', err);
       // Remove the failed user message from history
       this.conversationHistory.pop();
       return {
@@ -128,26 +130,34 @@ export class ChefService {
   }
 
   /**
-   * Parses the raw Gemini text output into a structured ChefResponse.
-   * Strips any accidental markdown fences and handles malformed JSON gracefully.
+   * Parses the raw JSON string from the server into a typed ChefResponse.
+   * Tries multiple extraction strategies before falling back gracefully.
    */
-  private parseGeminiResponse(raw: string, originalQuery: string): ChefResponse {
-    // Strip markdown code fences if Gemini wraps in them anyway
-    let cleaned = raw.trim();
-    cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
+  private parseChefResponse(raw: string): ChefResponse {
+    const parsed = this.tryParseJson(raw);
 
-    try {
-      const parsed = JSON.parse(cleaned);
+    if (parsed) {
       const result: ChefResponse = {
         text: this.markdownToBubbleHtml(parsed.text ?? 'Here you go! 🍽️'),
       };
 
-      if (parsed.recipe && parsed.recipe.title) {
+      if (parsed.recipe?.title) {
+        const rawSteps = Array.isArray(parsed.recipe.steps) ? parsed.recipe.steps : [];
+        const cleanedSteps = rawSteps.map((step: string) =>
+          typeof step === 'string'
+            ? step
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*(.*?)\*/g, '$1')
+                .trim()
+            : String(step),
+        );
+
         result.recipe = {
           title: parsed.recipe.title,
           description: parsed.recipe.description ?? '',
           ingredients: Array.isArray(parsed.recipe.ingredients) ? parsed.recipe.ingredients : [],
-          steps: Array.isArray(parsed.recipe.steps) ? parsed.recipe.steps : [],
+          steps: cleanedSteps,
+          totalNutrients: parsed.recipe.totalNutrients,
         };
       }
 
@@ -157,19 +167,50 @@ export class ChefService {
       }
 
       return result;
-    } catch {
-      // If JSON parse fails, return the raw text as plain chat message
-      console.warn('Gemini response was not valid JSON, using as plain text.');
-      return {
-        text: this.markdownToBubbleHtml(
-          cleaned || `I heard you! Ask me about any recipe or dish — I know them all. 🍲`,
-        ),
-      };
     }
+
+    console.warn('Chef API response could not be parsed as JSON.');
+    return {
+      text: `<p>I got a bit tangled up there! Could you try asking again? 🍲</p>`,
+    };
   }
 
   /**
-   * Converts simple **bold** and *italic* markdown to HTML for bubble display.
+   * Attempts multiple strategies to extract valid JSON from the raw response string.
+   * Strategy 1: Direct parse.
+   * Strategy 2: Strip markdown fences, then parse.
+   * Strategy 3: Regex-extract the outermost { ... } block, then parse.
+   */
+  private tryParseJson(raw: string): any | null {
+    const direct = raw.trim();
+    const attempts: string[] = [direct];
+
+    // Strip markdown fences
+    const stripped = direct
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '')
+      .trim();
+    if (stripped !== direct) attempts.push(stripped);
+
+    // Extract outermost { ... } block
+    const firstBrace = direct.indexOf('{');
+    const lastBrace = direct.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      attempts.push(direct.slice(firstBrace, lastBrace + 1));
+    }
+
+    for (const attempt of attempts) {
+      try {
+        return JSON.parse(attempt);
+      } catch {
+        // try next
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Converts **bold** and *italic* markdown to HTML for chat bubble display.
    */
   private markdownToBubbleHtml(text: string): string {
     return text
@@ -182,7 +223,8 @@ export class ChefService {
   }
 
   /**
-   * Parses timer requests locally (e.g. "set a timer for 5 minutes").
+   * Parses common timer phrases locally (e.g. "set a timer for 5 minutes")
+   * so we don't make an unnecessary AI round-trip for simple timer requests.
    * Returns null if the query is not a timer request.
    */
   private parseTimerRequest(query: string): ChefResponse | null {

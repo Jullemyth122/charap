@@ -1,10 +1,12 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { AuthService } from './services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ElevenlabsService {
+  private authService = inject(AuthService);
+
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
   private audioContext: AudioContext | null = null;
@@ -12,39 +14,31 @@ export class ElevenlabsService {
   private stream: MediaStream | null = null;
   private animationFrameId: number | null = null;
 
-  constructor() {}
-
   /**
    * Starts recording audio from the user's microphone.
    * Calls the onVisualizerData callback with frequency byte data for rendering a waveform.
    */
   async startRecording(onVisualizerData?: (data: Uint8Array) => void): Promise<void> {
     this.audioChunks = [];
-    
+
     // Request microphone access
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
-    // Setup MediaRecorder
+
+    // Pick the best supported mimeType
     let mimeType = 'audio/webm';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'audio/ogg';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'audio/mp4';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = ''; // fallback to default
-    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/ogg';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = ''; // browser default
 
     this.mediaRecorder = new MediaRecorder(this.stream, mimeType ? { mimeType } : undefined);
-    
+
     this.mediaRecorder.ondataavailable = (event) => {
       if (event.data && event.data.size > 0) {
         this.audioChunks.push(event.data);
       }
     };
 
-    // Setup Web Audio API for visualizer
+    // Web Audio API visualizer
     if (onVisualizerData) {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = this.audioContext.createMediaStreamSource(this.stream);
@@ -61,7 +55,7 @@ export class ElevenlabsService {
         onVisualizerData(dataArray);
         this.animationFrameId = requestAnimationFrame(draw);
       };
-      
+
       draw();
     }
 
@@ -69,7 +63,8 @@ export class ElevenlabsService {
   }
 
   /**
-   * Stops recording, releases the microphone, and transcribes the audio using ElevenLabs Scribe REST API.
+   * Stops recording, releases the microphone, and sends the audio to
+   * /api/stt for server-side transcription via ElevenLabs Scribe.
    */
   async stopRecording(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -79,7 +74,7 @@ export class ElevenlabsService {
       }
 
       this.mediaRecorder.onstop = async () => {
-        // Clean up visualizer resources
+        // Clean up visualizer
         if (this.animationFrameId) {
           cancelAnimationFrame(this.animationFrameId);
           this.animationFrameId = null;
@@ -90,22 +85,21 @@ export class ElevenlabsService {
         }
         this.analyser = null;
 
-        // Stop all media stream tracks
+        // Stop all microphone tracks
         if (this.stream) {
-          this.stream.getTracks().forEach(track => track.stop());
+          this.stream.getTracks().forEach((track) => track.stop());
           this.stream = null;
         }
 
-        // Combine chunks into a single audio Blob
+        // Combine chunks into one audio Blob
         const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
         const audioBlob = new Blob(this.audioChunks, { type: mimeType });
 
         try {
-          console.log(`Transcribing audio blob of size ${audioBlob.size} bytes using ElevenLabs Speech-to-Text REST API...`);
-          const text = await this.transcribeDirect(audioBlob);
+          const text = await this.transcribeViaApi(audioBlob);
           resolve(text);
         } catch (error: any) {
-          console.error('Error during ElevenLabs Speech-to-Text transcription:', error);
+          console.error('Error during STT transcription:', error);
           reject(error);
         }
       };
@@ -115,27 +109,28 @@ export class ElevenlabsService {
   }
 
   /**
-   * Directly calls the ElevenLabs Speech-to-Text REST API.
-   * This avoids importing Node.js-specific modules found in the ElevenLabs SDK,
-   * guaranteeing absolute compatibility with Angular's browser bundler.
+   * Sends the audio blob to /api/stt (serverless proxy).
+   * The ElevenLabs API key never leaves the server.
    */
-  private async transcribeDirect(audioBlob: Blob): Promise<string> {
+  private async transcribeViaApi(audioBlob: Blob): Promise<string> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'audio.webm');
     formData.append('model_id', 'scribe_v2');
     formData.append('tag_audio_events', 'true');
 
-    const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+    const authHeaders = this.authService.getAuthHeaders();
+    const response = await fetch('/api/transcribe', {
       method: 'POST',
       headers: {
-        'xi-api-key': environment.elevenlabsApiKey
+        // Don't set Content-Type manually — browser sets it with the correct multipart boundary
+        ...authHeaders,
       },
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`ElevenLabs STT error: ${response.status} - ${errorText}`);
+      throw new Error(`STT error ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();

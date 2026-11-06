@@ -1,0 +1,144 @@
+<div
+  class="auth-overlay"
+  [class.dark-mode]="isDarkMode()"
+  [class.light-mode]="!isDarkMode()"
+  (click)="close.emit()"
+>
+  <div class="auth-card" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="auth-header-left">
+        <div class="auth-avatar-icon">
+          <ng-container *ngIf="!authService.currentUser()">
+            <app-icon name="user" class="auth-hdr-icon"></app-icon>
+          </ng-container>
+          <ng-container *ngIf="authService.currentUser() as user">
+            <img
+              *ngIf="user.avatarUrl; else fallbackHdr"
+              [src]="user.avatarUrl"
+              class="auth-hdr-img"
+              alt="Avatar"
+            />
+            <ng-template #fallbackHdr>
+              <div class="auth-hdr-initials">{{ user.name.charAt(0).toUpperCase() }}</div>
+            </ng-template>
+          </ng-container>
+        </div>
+        <div>
+          <h3 class="auth-title">Account &amp; Session</h3>
+          <p class="auth-subtitle" *ngIf="!authService.currentUser()">
+            Sign in or continue as guest
+          </p>
+          <p class="auth-subtitle" *ngIf="authService.currentUser()">
+            Signed in as {{ authService.currentUser()?.email }}
+          </p>
+        </div>
+      </div>
+      <button class="auth-close-btn" (click)="close.emit()" title="Close">
+        <app-icon name="close" class="icon-xs"></app-icon>
+      </button>
+    </div>
+
+    <!-- Error Banner -->
+    <div *ngIf="errorMessage()" class="auth-error-banner">
+      <app-icon name="warning" class="icon-xs"></app-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+
+    <!-- LOGGED-IN STATE -->
+    <div *ngIf="authService.currentUser() as user" class="auth-profile-section">
+      <div class="profile-avatar-wrap">
+        <img
+          *ngIf="user.avatarUrl; else bigFallback"
+          [src]="user.avatarUrl"
+          class="profile-avatar-img"
+          alt="Avatar"
+        />
+        <ng-template #bigFallback>
+          <div class="profile-avatar-fallback">{{ user.name.charAt(0).toUpperCase() }}</div>
+        </ng-template>
+      </div>
+      <h4 class="profile-name">{{ user.name }}</h4>
+      <p class="profile-email">{{ user.email }}</p>
+      <div class="profile-badge">
+        <span class="badge-dot"></span>
+        Authenticated User
+      </div>
+      <button class="logout-btn" (click)="handleLogout()">
+        <app-icon name="logout" class="icon-xs"></app-icon>
+        Sign Out
+      </button>
+    </div>
+
+    <!-- GUEST / LOGIN STATE -->
+    <div *ngIf="!authService.currentUser()" class="auth-body">
+      <!-- Tab Switcher -->
+      <div class="auth-tabs">
+        <button
+          class="auth-tab"
+          [class.active]="activeTab() === 'login'"
+          (click)="onTabChange('login')"
+        >
+          Sign In
+        </button>
+        <button
+          class="auth-tab"
+          [class.active]="activeTab() === 'guest'"
+          (click)="onTabChange('guest')"
+        >
+          Guest Session
+        </button>
+      </div>
+
+      <!-- SIGN-IN TAB -->
+      <div *ngIf="activeTab() === 'login'" class="auth-tab-content">
+        <p class="auth-desc">
+          Sign in to save your recipes and unlock higher AI request limits across all your devices.
+        </p>
+
+        <!-- GIS renders button here -->
+        <div class="google-btn-wrap" [class.loading]="isSigningIn()">
+          <div #googleButtonContainer class="google-btn-container"></div>
+          <div *ngIf="isSigningIn()" class="google-btn-loading">
+            <div class="spinner"></div>
+            <span>Signing in...</span>
+          </div>
+        </div>
+
+        <p class="auth-tos-note">
+          By signing in, you agree to Charap's terms of use. Your data stays private.
+        </p>
+      </div>
+
+      <!-- GUEST SESSION TAB -->
+      <div *ngIf="activeTab() === 'guest'" class="auth-tab-content">
+        <div class="guest-card">
+          <div class="guest-status-row">
+            <span class="guest-dot"></span>
+            <span class="guest-status-text">Anonymous Guest Active</span>
+          </div>
+
+          <p class="guest-label">Your Guest Session ID</p>
+          <div class="guest-uuid-row">
+            <code class="guest-uuid-code">{{ authService.guestUuid() || 'Generating...' }}</code>
+            <button
+              class="copy-btn"
+              (click)="copyGuestUuid()"
+              [title]="isCopied() ? 'Copied!' : 'Copy ID'"
+            >
+              <ng-container *ngIf="!isCopied()">
+                <app-icon name="copy" class="icon-xs"></app-icon>
+              </ng-container>
+              <ng-container *ngIf="isCopied()">✓</ng-container>
+            </button>
+          </div>
+
+          <p class="guest-limit-text">
+            ⚡ <strong>10 AI queries / hour</strong> as guest. Sign in anytime to link this session
+            and upgrade your limits.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

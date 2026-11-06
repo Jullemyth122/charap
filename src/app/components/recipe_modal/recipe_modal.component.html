@@ -1,0 +1,394 @@
+<div
+  class="recipe-modal-backdrop"
+  [class.dark-mode]="isDarkMode()"
+  (click)="handleBackdropClick()"
+  (keydown.escape)="handleClose()"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="recipe().title"
+>
+  <div class="recipe-modal" (click)="$event.stopPropagation()">
+    <!-- ── Modal Header ─────────────────────────────────────────── -->
+    <div class="modal-header">
+      <div class="modal-title-block">
+        <div class="modal-eyebrow">
+          <app-icon name="book" size="12"></app-icon>
+          Recipe Guide
+        </div>
+        <h2 class="modal-title">{{ recipe().title }}</h2>
+        <p class="modal-desc">{{ recipe().description }}</p>
+      </div>
+      <button type="button" (click)="handleClose()" class="modal-close" aria-label="Close recipe">
+        <app-icon name="close" size="18"></app-icon>
+      </button>
+    </div>
+
+    <!-- ── Progress Bar ──────────────────────────────────────────── -->
+    <div class="modal-progress-track">
+      <div
+        class="modal-progress-fill"
+        [style.width.%]="((currentStepIndex() + 1) / recipe().steps.length) * 100"
+      ></div>
+    </div>
+
+    <!-- ── Modal Body ────────────────────────────────────────────── -->
+    <div class="modal-body">
+      <!-- ═══ Ingredients Panel ═══ -->
+      <aside class="modal-ingredients">
+        <h3 class="modal-section-label">
+          <app-icon name="book" size="13"></app-icon>
+          Ingredients
+        </h3>
+
+        <div class="modal-ingredients-list">
+          @for (ing of recipe().ingredients; track ing.name; let i = $index) {
+            @let isChecked = checkedIngredients()[ing.name];
+            @let isExpanded = expandedIngredientIndex() === i;
+
+            <div class="modal-ingredient-rich">
+              <!-- Main row -->
+              <div class="ingredient-main-row">
+                <label class="ingredient-label">
+                  <input
+                    type="checkbox"
+                    [checked]="isChecked"
+                    (change)="toggleIngredient(ing.name)"
+                    class="ingredient-check"
+                  />
+                  <span class="ingredient-text" [class.done]="isChecked">
+                    <span class="ing-amount">{{ ing.amount }}</span> {{ ing.name }}
+                    @if (ing.notes) {
+                      <span class="ing-notes">({{ ing.notes }})</span>
+                    }
+                  </span>
+                </label>
+
+                <div class="ing-right-controls">
+                  @if (ing.nutrients?.calories) {
+                    <span class="compact-kcal-badge">{{ ing.nutrients?.calories }}</span>
+                  }
+                  <button
+                    type="button"
+                    class="ing-expand-btn"
+                    (click)="toggleIngredientNutrients(i, $event)"
+                    [attr.aria-expanded]="isExpanded"
+                    title="Toggle full nutrient breakdown"
+                  >
+                    <span>ⓘ Details</span>
+                    <app-icon
+                      name="chevron-down"
+                      class="chevron-icon"
+                      [class.rotated]="isExpanded"
+                      size="12"
+                    ></app-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Compact summary bar (collapsed) -->
+              @if (!isExpanded && ing.nutrients) {
+                @let chips = getCompactChips(ing.nutrients);
+                @if (chips.length) {
+                  <div class="ingredient-compact-bar">
+                    @for (chip of chips; track chip.prefix) {
+                      <span class="micro-chip">{{ chip.prefix }}: {{ chip.value }}</span>
+                    }
+                  </div>
+                }
+              }
+
+              <!-- Expanded Ingredient Drawer -->
+              @if (isExpanded) {
+                <div class="ingredient-expanded-drawer">
+                  @if (ing.nutrients; as nutrients) {
+                    <!-- Nutritional Profile badges -->
+                    @let macros = getDrawerMacros(nutrients);
+                    @let vitamins = getDrawerVitamins(nutrients);
+                    @let minerals = getDrawerMinerals(nutrients);
+                    @if (macros.length || vitamins.length || minerals.length) {
+                      <div class="drawer-section">
+                        <div class="drawer-section-title">Nutritional Profile</div>
+                        <div class="drawer-tags-grid">
+                          @for (badge of macros; track badge.label) {
+                            <span class="drawer-badge macro"
+                              >{{ badge.label }}: {{ badge.value }}</span
+                            >
+                          }
+                          @for (badge of vitamins; track badge.label) {
+                            <span class="drawer-badge vit"
+                              >{{ badge.label }}: {{ badge.value }}</span
+                            >
+                          }
+                          @for (badge of minerals; track badge.label) {
+                            <span class="drawer-badge mineral"
+                              >{{ badge.label }}: {{ badge.value }}</span
+                            >
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Chemical Elements -->
+                    @if (nutrients.elements?.length) {
+                      <div class="drawer-section">
+                        <div class="drawer-section-title">Chemical Elements</div>
+                        <div class="element-pills-wrap">
+                          @for (el of nutrients.elements; track el.element) {
+                            <span class="element-pill">
+                              <strong class="el-sym">{{ el.symbol || el.element }}</strong>
+                              <span class="el-name">{{ el.element }}</span>
+                              @if (el.amount) {
+                                <span class="el-amt">({{ el.amount }})</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Phytochemicals -->
+                    @if (nutrients.phytochemicals?.length) {
+                      <div class="drawer-section">
+                        <div class="drawer-section-title">Bioactives & Phytochemicals</div>
+                        <div class="phyto-tags-wrap">
+                          @for (p of nutrients.phytochemicals; track p) {
+                            <span class="phyto-tag">{{ p }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+
+                  <!-- Substitutions -->
+                  @if (ing.substitutions?.length) {
+                    <div class="drawer-section">
+                      <div class="drawer-section-title">Alternatives & Substitutes</div>
+                      <div class="subs-tags-wrap">
+                        @for (sub of ing.substitutions; track sub) {
+                          <span class="sub-tag">{{ sub }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Checked count -->
+        <div class="modal-ing-count">
+          {{ getCheckedCount() }} / {{ recipe().ingredients.length }} checked
+        </div>
+
+        <!-- ═══ Total Dish Nutrition Card ═══ -->
+        @if (recipe().totalNutrients; as total) {
+          <div class="modal-total-nutrients-card">
+            <div class="nutrients-card-header">
+              <h4 class="nutrients-card-title">Total Dish Nutrition</h4>
+              <button type="button" class="nutrients-toggle-btn" (click)="toggleTotalNutrition()">
+                <span>{{
+                  isTotalNutritionExpanded() ? 'Collapse breakdown' : 'Full breakdown & Chemistry'
+                }}</span>
+                <app-icon
+                  name="chevron-down"
+                  class="chevron-icon"
+                  [class.rotated]="isTotalNutritionExpanded()"
+                  size="14"
+                ></app-icon>
+              </button>
+            </div>
+
+            <!-- Hero Macros -->
+            <div class="nutrients-hero-grid">
+              <div class="hero-macro-item kcal">
+                <span class="value">{{ total.calories || 'N/A' }}</span>
+                <span class="label">Calories</span>
+              </div>
+              <div class="hero-macro-item protein">
+                <span class="value">{{ total.protein || 'N/A' }}</span>
+                <span class="label">Protein</span>
+              </div>
+              <div class="hero-macro-item carbs">
+                <span class="value">{{ total.carbs || 'N/A' }}</span>
+                <span class="label">Carbs</span>
+              </div>
+              <div class="hero-macro-item fat">
+                <span class="value">{{ total.fat || 'N/A' }}</span>
+                <span class="label">Fat</span>
+              </div>
+            </div>
+
+            <!-- Detailed Accordion -->
+            @if (isTotalNutritionExpanded()) {
+              <div class="nutrients-accordion-body">
+                <!-- Tabs -->
+                <div class="nutrition-tabs">
+                  @for (
+                    tab of [
+                      { id: 'macros', label: 'Macros & Hydration' },
+                      { id: 'vitamins', label: 'Vitamins' },
+                      { id: 'minerals', label: 'Minerals' },
+                      { id: 'elemental', label: 'Chemistry (Periodic)', extra: 'elemental-tab' },
+                    ];
+                    track tab.id
+                  ) {
+                    <button
+                      type="button"
+                      class="tab-btn"
+                      [class]="'tab-btn' + (tab.extra ? ' ' + tab.extra : '')"
+                      [class.active]="activeNutritionTab() === tab.id"
+                      (click)="setActiveNutritionTab($any(tab.id))"
+                    >
+                      {{ tab.label }}
+                    </button>
+                  }
+                </div>
+
+                @switch (activeNutritionTab()) {
+                  <!-- Tab: Macros & Hydration -->
+                  @case ('macros') {
+                    <div class="tab-pane">
+                      <div class="tab-grid">
+                        @for (stat of getTabStats('macros', total); track stat.label) {
+                          <div class="tab-stat-card" [class.wide]="stat.wide">
+                            <span class="stat-lbl">{{ stat.label }}</span>
+                            <span class="stat-val" [class.highlight]="stat.highlight">{{
+                              stat.value
+                            }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Tab: Vitamins -->
+                  @case ('vitamins') {
+                    <div class="tab-pane">
+                      <div class="tab-grid">
+                        @for (stat of getTabStats('vitamins', total); track stat.label) {
+                          <div class="tab-stat-card">
+                            <span class="stat-lbl">{{ stat.label }}</span>
+                            <span class="stat-val">{{ stat.value }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Tab: Minerals -->
+                  @case ('minerals') {
+                    <div class="tab-pane">
+                      <div class="tab-grid">
+                        @for (stat of getTabStats('minerals', total); track stat.label) {
+                          <div class="tab-stat-card">
+                            <span class="stat-lbl">{{ stat.label }}</span>
+                            <span class="stat-val">{{ stat.value }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Tab: Chemistry (Periodic) -->
+                  @case ('elemental') {
+                    <div class="tab-pane">
+                      <div class="elemental-breakdown-container">
+                        <div class="periodic-grid">
+                          @for (tile of getElementTiles(total); track tile.name) {
+                            <div class="periodic-tile">
+                              <div class="tile-sym">{{ tile.symbol }}</div>
+                              <div class="tile-details">
+                                <div class="tile-name">{{ tile.name }}</div>
+                                @if (tile.amount) {
+                                  <div class="tile-amt">{{ tile.amount }}</div>
+                                }
+                                @if (tile.note) {
+                                  <div class="tile-note">{{ tile.note }}</div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+
+                        @if (total.phytochemicals?.length) {
+                          <div class="phytochemicals-section">
+                            <div class="phytochemicals-title">
+                              Bioactive Phytochemicals & Antioxidants
+                            </div>
+                            <div class="phytochemicals-list">
+                              @for (phyto of total.phytochemicals; track phyto) {
+                                <span class="phyto-chip">✨ {{ phyto }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </aside>
+
+      <!-- ═══ Steps Panel ═══ -->
+      <div class="modal-steps">
+        <div class="modal-step-nav-top">
+          <span class="modal-step-badge">
+            Step {{ currentStepIndex() + 1 }}
+            <span class="step-badge-sep">of</span>
+            {{ recipe().steps.length }}
+          </span>
+          <div class="modal-step-dots" role="tablist" aria-label="Recipe steps">
+            @for (s of recipe().steps; track $index; let si = $index) {
+              <button
+                type="button"
+                class="step-dot"
+                [class.step-dot-active]="si === currentStepIndex()"
+                [class.step-dot-done]="si < currentStepIndex()"
+                (click)="goToStep(si)"
+                [attr.aria-label]="'Go to step ' + (si + 1)"
+              ></button>
+            }
+          </div>
+        </div>
+
+        <div class="modal-step-content">
+          <p class="modal-step-text">{{ recipe().steps[currentStepIndex()] }}</p>
+        </div>
+
+        <div class="modal-step-nav-bottom">
+          <button
+            type="button"
+            [disabled]="currentStepIndex() === 0"
+            (click)="prevStep()"
+            class="modal-nav-btn modal-nav-prev"
+          >
+            <app-icon name="chevron-down" class="nav-prev-arrow" size="16"></app-icon>
+            Previous
+          </button>
+
+          <span class="modal-step-frac">
+            {{ currentStepIndex() + 1 }} / {{ recipe().steps.length }}
+          </span>
+
+          <button
+            type="button"
+            [disabled]="currentStepIndex() === recipe().steps.length - 1"
+            (click)="nextStep()"
+            class="modal-nav-btn modal-nav-next"
+          >
+            Next Step
+            <app-icon name="chevron-down" class="nav-next-arrow" size="16"></app-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal-body -->
+  </div>
+  <!-- /.recipe-modal -->
+</div>
+<!-- /.recipe-modal-backdrop -->

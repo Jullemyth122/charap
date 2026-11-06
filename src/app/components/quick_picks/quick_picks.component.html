@@ -1,0 +1,52 @@
+<div class="card prompts-card" [ngClass]="isDarkMode() ? 'card-dark' : 'card-light'">
+  <div class="prompts-header-row" (click)="toggleQuickPicks.emit()">
+    <span class="prompts-eyebrow" [ngClass]="isDarkMode() ? 'eyebrow-dark' : 'eyebrow-light'"
+      >Quick Picks</span
+    >
+    <div
+      class="eyebrow-line"
+      [ngClass]="isDarkMode() ? 'eyebrow-line-dark' : 'eyebrow-line-light'"
+    ></div>
+
+    <!-- Collapse Toggle Chevron -->
+    <button
+      type="button"
+      class="collapse-toggle-btn"
+      [ngClass]="isDarkMode() ? 'toggle-dark' : 'toggle-light'"
+      [attr.aria-expanded]="!isQuickPicksCollapsed()"
+      aria-label="Toggle Quick Picks suggestion list"
+    >
+      <app-icon
+        name="chevron-down"
+        class="chevron-icon-sm"
+        [class.rotated]="isQuickPicksCollapsed()"
+      ></app-icon>
+    </button>
+  </div>
+
+  @if (!isQuickPicksCollapsed()) {
+    <div class="prompts-list-wrap">
+      @for (item of quickPrompts(); track $index) {
+        <button
+          (click)="useQuickPrompt.emit(item.query)"
+          class="prompt-btn"
+          [ngClass]="isDarkMode() ? 'prompt-btn-dark' : 'prompt-btn-light'"
+          [disabled]="isBusy()"
+          [class.prompt-btn-disabled]="isBusy()"
+          [title]="isBusy() ? 'Please wait — AI is responding…' : item.label"
+        >
+          <span
+            class="prompt-index"
+            [ngClass]="isDarkMode() ? 'prompt-index-dark' : 'prompt-index-light'"
+          >
+            {{ ($index + 1).toString().padStart(2, '0') }}
+          </span>
+          <!-- Modular Prompt Icon -->
+          <app-icon [name]="$any(item.icon)" class="prompt-icon"></app-icon>
+          <span class="prompt-label">{{ item.label }}</span>
+          <app-icon name="chevron-down" class="prompt-arrow-right"></app-icon>
+        </button>
+      }
+    </div>
+  }
+</div>

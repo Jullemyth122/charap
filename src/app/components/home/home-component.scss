@@ -1,0 +1,1222 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  CHARAP HOME COMPONENT — Responsive Hero & Multi-Layer Orbit Architecture
+// ─────────────────────────────────────────────────────────────────────────────
+
+//  HOST
+:host {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 64px);
+  min-height: 620px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+//  ROOT CONTAINER
+.hero-container {
+  width: 100%;
+  height: 100%;
+  padding: clamp(1rem, 2vw, 1.75rem) clamp(1.25rem, 2.5vw, 2.5rem);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+//  2-COLUMN GRID (Side-by-side on all desktop screens)
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(14px, 1.8vw, 22px);
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  align-items: stretch;
+}
+
+//  LEFT COLUMN  (3 stacked children filling full height)
+.hero-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+}
+
+//  GLASS CARD  (shared base)
+.glass-card {
+  position: relative;
+  border-radius: 18px;
+  box-sizing: border-box;
+
+  // Pure transparent glass
+  background: transparent;
+  backdrop-filter: blur(60px);
+  -webkit-backdrop-filter: blur(60px);
+}
+
+//  CARD VARIANTS
+
+// ① Title card  — takes ~58% of left height
+.card-title {
+  flex: 1.45;
+  min-height: 0;
+  padding: clamp(1.5rem, 2.2vw, 2.25rem) clamp(1.75rem, 2.6vw, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+// ② Statement card — takes ~42% of left height
+.card-statement {
+  flex: 1;
+  min-height: 0;
+  padding: clamp(1.15rem, 1.6vw, 1.6rem) clamp(1.75rem, 2.6vw, 2.75rem);
+  display: flex;
+  align-items: center;
+}
+
+// ③ Right graphic card
+.card-graphic {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+//  GRADIENT ORBS
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+// Title card orbs
+.orb-tr {
+  width: 380px;
+  height: 380px;
+  top: -160px;
+  right: -130px;
+}
+.orb-bl {
+  width: 200px;
+  height: 200px;
+  bottom: -80px;
+  left: -60px;
+}
+
+// Statement card orbs
+.orb-bl-lg {
+  width: 280px;
+  height: 280px;
+  bottom: -110px;
+  left: -90px;
+}
+.orb-tr-sm {
+  width: 160px;
+  height: 160px;
+  top: -55px;
+  right: -45px;
+}
+
+// Graphic card orbs
+.orb-graphic-tr {
+  width: 450px;
+  height: 450px;
+  top: -180px;
+  right: -160px;
+}
+.orb-graphic-bl {
+  width: 420px;
+  height: 420px;
+  bottom: -160px;
+  left: -140px;
+}
+
+//  TYPOGRAPHY & CONTENT
+.pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  width: fit-content;
+  margin-bottom: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f97316;
+  flex-shrink: 0;
+}
+
+.hero-title {
+  font-size: clamp(1.8rem, 2.7vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1.13;
+  letter-spacing: -0.033em;
+  margin: 0 0 0.85rem;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.text-gradient {
+  background: linear-gradient(128deg, #f97316 0%, #fb923c 45%, #fdba74 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.92rem, 1.12vw, 1.04rem);
+  line-height: 1.62;
+  margin: 0 0 1.35rem;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.feature-metrics {
+  display: flex;
+  gap: clamp(1.75rem, 3.5vw, 4rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-val {
+  font-size: clamp(1.55rem, 2vw, 2rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.metric-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 600;
+}
+
+.hero-statement-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-statement {
+  font-size: clamp(0.9rem, 1.08vw, 1rem);
+  line-height: 1.68;
+  margin: 0;
+  width: 100%;
+
+  &--secondary {
+    font-size: clamp(0.85rem, 1vw, 0.94rem);
+    line-height: 1.62;
+    opacity: 0.88;
+  }
+}
+
+.brand-name {
+  font-weight: 700;
+}
+
+//  BUTTONS ROW  (fixed height, fills width)
+.hero-actions-row {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  gap: 11px;
+  height: 52px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  width: 100%;
+  border-radius: 13px;
+  font-size: clamp(0.82rem, 0.95vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+
+  .btn-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+}
+
+//  SVG WRAPPER
+.svg-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 65%;
+  max-width: 320px;
+  aspect-ratio: 1;
+}
+
+.cooking-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.fire {
+  pointer-events: none;
+}
+
+// Background gradient orbs motion
+.orb {
+  &.orb-tr,
+  &.orb-graphic-tr {
+    animation: orbDrift 9s ease-in-out infinite;
+  }
+
+  &.orb-bl,
+  &.orb-bl-lg,
+  &.orb-graphic-bl {
+    animation: orbDrift 11.5s ease-in-out infinite -4.5s;
+  }
+
+  &.orb-tr-sm {
+    animation: orbDrift 8s ease-in-out infinite -2s;
+  }
+}
+
+@keyframes orbDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(18px, -14px) scale(1.06);
+  }
+  66% {
+    transform: translate(-10px, 12px) scale(0.96);
+  }
+}
+
+@keyframes voicePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.35);
+  }
+}
+
+@keyframes soundWave {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+//  FLOATING BADGES  (inside graphic card)
+.float-badge {
+  position: absolute;
+  z-index: 10;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 14px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+// ─── VOICE BADGE ───
+.badge-voice {
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.voice-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #22c55e;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.voice-output-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .wave-bar {
+    width: 2px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 2px;
+    animation: soundWave 1.2s ease-in-out infinite;
+
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+
+  .speech-bubble {
+    font-size: 0.72rem;
+    font-style: italic;
+    opacity: 0.9;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+}
+
+.badge-macro {
+  top: 20px;
+  right: 20px;
+}
+
+// Macro SVG ring
+.macro-ring {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  .ring-bg {
+    fill: none;
+    stroke: rgba(249, 115, 22, 0.18);
+    stroke-width: 3;
+  }
+  .ring-fill {
+    fill: none;
+    stroke: #f97316;
+    stroke-width: 3;
+    stroke-dasharray: 88;
+    stroke-dashoffset: 22;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+  }
+  .ring-text {
+    fill: #fb923c;
+    font-size: 9px;
+    font-weight: 700;
+  }
+}
+
+// ── MULTI-LAYER ORBITING RECIPES SYSTEM ──
+
+// Shared wrapper
+.recipe-orbit-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  width: 480px;
+  height: 480px;
+}
+
+// Shared container base
+.recipe-orbit-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+// ── Ring sizes ──
+.orbit-layer-1 {
+  width: 240px;
+  height: 240px;
+}
+.orbit-layer-2 {
+  width: 350px;
+  height: 350px;
+}
+.orbit-layer-3 {
+  width: 465px;
+  height: 465px;
+}
+
+// Shared dashed track ring
+.orbit-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(249, 115, 22, 0.18);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.04);
+}
+
+// Shared orbit spinner base
+.recipe-orbit-spinner {
+  position: absolute;
+  inset: 0;
+
+  &:hover {
+    animation-play-state: paused;
+    .recipe-capsule {
+      animation-play-state: paused;
+    }
+  }
+}
+
+// ── Spinner animations (alternating directions) ──
+.orbit-spin-cw-1 {
+  animation: orbitCW 32s linear infinite;
+}
+.orbit-spin-ccw-2 {
+  animation: orbitCCW 44s linear infinite;
+}
+.orbit-spin-cw-3 {
+  animation: orbitCW 58s linear infinite;
+}
+
+// ── Capsule counter-rotation (keeps labels upright) ──
+.recipe-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 5px;
+  border-radius: 100px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(18, 14, 11, 0.85);
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  animation: counterCW 32s linear infinite;
+
+  &:hover {
+    border-color: #f97316;
+    box-shadow: 0 6px 22px rgba(249, 115, 22, 0.4);
+  }
+
+  &.capsule-l2 {
+    animation: counterCCW 44s linear infinite;
+  }
+
+  &.capsule-l3 {
+    animation: counterCW 58s linear infinite;
+  }
+
+  .flag-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 14px;
+    border-radius: 2.5px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+
+    .flag-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+
+  .recipe-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fafaf9;
+  }
+}
+
+// ── Orbit item positions ──
+.orbit-item {
+  position: absolute;
+  pointer-events: auto;
+
+  // ─ Layer 1: 4 items (N, E, S, W) ─
+  &.orbit-item-1 {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-2 {
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+  &.orbit-item-3 {
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+  }
+  &.orbit-item-4 {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  // ─ Layer 2: 4 items (NE, SE, SW, NW) at 45°, 135°, 225°, 315° ─
+  &.orbit-item-l2-1 {
+    top: 14.64%;
+    left: 85.36%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l2-2 {
+    top: 85.36%;
+    left: 85.36%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l2-3 {
+    top: 85.36%;
+    left: 14.64%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l2-4 {
+    top: 14.64%;
+    left: 14.64%;
+    transform: translate(-50%, -50%);
+  }
+
+  // ─ Layer 3: 5 items (0°, 72°, 144°, 216°, 288°) ─
+  &.orbit-item-l3-1 {
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l3-2 {
+    top: 34.55%;
+    left: 97.55%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l3-3 {
+    top: 90.45%;
+    left: 79.39%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l3-4 {
+    top: 90.45%;
+    left: 20.61%;
+    transform: translate(-50%, -50%);
+  }
+  &.orbit-item-l3-5 {
+    top: 34.55%;
+    left: 2.45%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// ── Orbit keyframes ──
+@keyframes orbitCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes orbitCCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes counterCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes counterCCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.voice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: voicePulse 1.8s ease-in-out infinite;
+}
+
+.badge-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.badge-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.badge-sub {
+  font-size: 0.69rem;
+}
+
+//  DARK MODE
+:host-context(.dark-mode) {
+  .glass-card {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+      inset 1px 0 0 rgba(255, 255, 255, 0.035),
+      0 24px 64px rgba(0, 0, 0, 0.55);
+  }
+
+  .pill-tag {
+    background: rgba(249, 115, 22, 0.11);
+    color: #fb923c;
+  }
+  .hero-title {
+    color: #faf9f8;
+  }
+  .hero-subtitle,
+  .hero-statement {
+    color: #8e8880;
+  }
+  .metric-label {
+    color: #5e5a56;
+  }
+  .brand-name {
+    color: #f97316;
+  }
+
+  .float-badge {
+    background: rgba(14, 12, 10, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .badge-label,
+  .badge-title {
+    color: #fafaf9;
+  }
+  .badge-sub {
+    color: #5e5a56;
+  }
+
+  .recipe-icon {
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+  }
+
+  .badge-voice {
+    color: #fb923c;
+  }
+
+  .orb-tr,
+  .orb-tr-sm {
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.34) 0%, transparent 68%);
+  }
+  .orb-bl,
+  .orb-bl-lg {
+    background: radial-gradient(circle, rgba(234, 88, 12, 0.22) 0%, transparent 68%);
+  }
+  .orb-graphic-tr {
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, transparent 62%);
+  }
+  .orb-graphic-bl {
+    background: radial-gradient(circle, rgba(234, 88, 12, 0.24) 0%, transparent 62%);
+  }
+
+  .svg-wrapper {
+    color: #f97316;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #b83008 0%, #ea580c 45%, #f97316 100%);
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(234, 88, 12, 0.38);
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px rgba(234, 88, 12, 0.54);
+    }
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.062);
+    backdrop-filter: blur(16px);
+    color: #e3e0dc;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(16px);
+    color: #8e8880;
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(249, 115, 22, 0.08);
+      color: #f97316;
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+  }
+}
+
+//  LIGHT MODE
+:host-context(.light-mode) {
+  .glass-card {
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+      0 12px 48px rgba(0, 0, 0, 0.07);
+  }
+
+  .pill-tag {
+    background: rgba(249, 115, 22, 0.1);
+    color: #ea580c;
+  }
+  .hero-title {
+    color: #1c1917;
+  }
+  .hero-subtitle,
+  .hero-statement {
+    color: #57534e;
+  }
+  .metric-label {
+    color: #78716c;
+  }
+  .brand-name {
+    color: #ea580c;
+  }
+
+  .float-badge {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .badge-label,
+  .badge-title {
+    color: #1c1917;
+  }
+  .badge-sub {
+    color: #78716c;
+  }
+
+  .voice-logo {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.2);
+    color: #16a34a;
+  }
+
+  .voice-output-text {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+
+    .wave-bar {
+      background: #16a34a;
+    }
+  }
+
+  .recipe-icon {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.18);
+  }
+
+  .badge-voice {
+    color: #ea580c;
+  }
+
+  .recipe-capsule {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(249, 115, 22, 0.35);
+    box-shadow:
+      0 4px 14px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    .recipe-name {
+      color: #1c1917;
+    }
+  }
+
+  .orb-tr,
+  .orb-tr-sm {
+    background: radial-gradient(
+      circle,
+      rgba(180, 68, 12, 0.52) 0%,
+      rgba(146, 44, 8, 0.22) 40%,
+      transparent 82%
+    );
+  }
+  .orb-bl,
+  .orb-bl-lg {
+    background: radial-gradient(
+      circle,
+      rgba(140, 52, 10, 0.44) 0%,
+      rgba(120, 38, 8, 0.18) 42%,
+      transparent 80%
+    );
+  }
+  .orb-graphic-tr {
+    background: radial-gradient(
+      circle,
+      rgba(190, 72, 14, 0.46) 0%,
+      rgba(155, 52, 10, 0.2) 38%,
+      transparent 82%
+    );
+  }
+  .orb-graphic-bl {
+    background: radial-gradient(
+      circle,
+      rgba(160, 58, 10, 0.48) 0%,
+      rgba(130, 44, 8, 0.22) 40%,
+      transparent 85%
+    );
+  }
+
+  .svg-wrapper {
+    color: #ea580c;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.28);
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(234, 88, 12, 0.42);
+    }
+  }
+
+  .btn-secondary {
+    background: rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(16px);
+    color: #292524;
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(0, 0, 0, 0.07);
+    }
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(16px);
+    color: #57534e;
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(249, 115, 22, 0.06);
+      color: #ea580c;
+      border-color: rgba(249, 115, 22, 0.35);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RESPONSIVE OVERRIDES
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Medium Desktop & Laptop (861px - 1280px) ──
+@media (max-width: 1280px) and (min-width: 861px) {
+  .hero-container {
+    padding: 1rem 1.25rem;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1.14fr 1fr;
+    gap: 12px;
+  }
+
+  .card-title {
+    padding: 1.35rem 1.75rem;
+  }
+
+  .card-statement {
+    padding: 1rem 1.75rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    margin-bottom: 0.6rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .feature-metrics {
+    gap: 1.5rem;
+    padding-top: 0.8rem;
+  }
+
+  .metric-val {
+    font-size: 1.45rem;
+  }
+
+  .hero-statement {
+    font-size: 0.86rem;
+    line-height: 1.6;
+
+    &--secondary {
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+  }
+
+  .hero-actions-row {
+    height: 48px;
+    gap: 9px;
+  }
+
+  .cta-btn {
+    font-size: 0.82rem;
+  }
+
+  .recipe-orbit-wrapper {
+    width: 390px;
+    height: 390px;
+  }
+  .orbit-layer-1 {
+    width: 195px;
+    height: 195px;
+  }
+  .orbit-layer-2 {
+    width: 285px;
+    height: 285px;
+  }
+  .orbit-layer-3 {
+    width: 380px;
+    height: 380px;
+  }
+
+  .recipe-capsule {
+    padding: 3px 8px 3px 4px;
+    gap: 5px;
+
+    .recipe-name {
+      font-size: 0.66rem;
+    }
+    .flag-wrapper {
+      width: 17px;
+      height: 12px;
+    }
+  }
+
+  .svg-wrapper {
+    width: 60%;
+    max-width: 260px;
+  }
+}
+
+// ── Tablet & Small Screens (≤ 860px) — Stacked Single-Column ──
+@media (max-width: 860px) {
+  :host {
+    height: auto;
+    min-height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .hero-container {
+    height: auto;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 14px;
+  }
+
+  .hero-left-col {
+    height: auto;
+    gap: 12px;
+  }
+
+  .card-title,
+  .card-statement {
+    flex: none;
+    height: auto;
+    padding: 1.5rem 1.75rem;
+  }
+
+  .card-graphic {
+    min-height: 460px;
+    height: auto;
+  }
+
+  .recipe-orbit-wrapper {
+    width: 360px;
+    height: 360px;
+  }
+  .orbit-layer-1 {
+    width: 180px;
+    height: 180px;
+  }
+  .orbit-layer-2 {
+    width: 260px;
+    height: 260px;
+  }
+  .orbit-layer-3 {
+    width: 350px;
+    height: 350px;
+  }
+}
+
+// ── Mobile Devices (≤ 640px) ──
+@media (max-width: 640px) {
+  .hero-container {
+    padding: 0.85rem 0.75rem 1.5rem;
+  }
+
+  .card-title,
+  .card-statement {
+    padding: 1.15rem 1.25rem;
+  }
+
+  .hero-actions-row {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 8px;
+  }
+
+  .cta-btn {
+    height: 46px;
+    font-size: 0.82rem;
+  }
+
+  .feature-metrics {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .float-badge {
+    padding: 6px 10px;
+  }
+
+  .badge-voice {
+    top: 12px;
+    left: 12px;
+  }
+
+  .card-graphic {
+    min-height: 400px;
+  }
+
+  .recipe-orbit-wrapper {
+    width: 310px;
+    height: 310px;
+  }
+  .orbit-layer-1 {
+    width: 155px;
+    height: 155px;
+  }
+  .orbit-layer-2 {
+    width: 225px;
+    height: 225px;
+  }
+  .orbit-layer-3 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .recipe-capsule {
+    padding: 2.5px 6px 2.5px 3px;
+    gap: 4px;
+
+    .recipe-name {
+      font-size: 0.6rem;
+    }
+    .flag-wrapper {
+      width: 15px;
+      height: 10px;
+    }
+  }
+
+  .svg-wrapper {
+    width: 56%;
+    max-width: 200px;
+  }
+}
+
+// ── Extra Small Phone (≤ 420px) ──
+@media (max-width: 420px) {
+  .card-graphic {
+    min-height: 360px;
+  }
+
+  .recipe-orbit-wrapper {
+    width: 270px;
+    height: 270px;
+  }
+  .orbit-layer-1 {
+    width: 135px;
+    height: 135px;
+  }
+  .orbit-layer-2 {
+    width: 195px;
+    height: 195px;
+  }
+  .orbit-layer-3 {
+    width: 260px;
+    height: 260px;
+  }
+
+  .recipe-capsule .recipe-name {
+    font-size: 0.54rem;
+  }
+
+  .svg-wrapper {
+    width: 52%;
+    max-width: 160px;
+  }
+}

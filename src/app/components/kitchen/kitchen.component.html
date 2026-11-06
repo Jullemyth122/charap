@@ -1,0 +1,61 @@
+<!-- Main Kitchen Layout -->
+<main class="app-main">
+  <!-- Left Column -->
+  <section class="left-col">
+    <!-- Voice Panel -->
+    <app-voice-panel
+      [isDarkMode]="themeService.isDarkMode()"
+      [isRecording]="isRecording()"
+      [isBusy]="isBusy()"
+      [visualizerData]="visualizerData()"
+      (toggleRecording)="toggleRecording()"
+    >
+    </app-voice-panel>
+
+    <!-- Dish Suggestions -->
+    <app-quick-picks
+      [isDarkMode]="themeService.isDarkMode()"
+      [isBusy]="isBusy()"
+      [isQuickPicksCollapsed]="isQuickPicksCollapsed()"
+      [quickPrompts]="quickPrompts"
+      (toggleQuickPicks)="toggleQuickPicks()"
+      (useQuickPrompt)="useQuickPrompt($event)"
+    >
+    </app-quick-picks>
+  </section>
+
+  <!-- Right Column -->
+  <section class="right-col">
+    <!-- Live Kitchen Timers -->
+    <app-active-timers
+      [isDarkMode]="themeService.isDarkMode()"
+      [timers]="timers()"
+      (deleteTimer)="deleteTimer($event)"
+    >
+    </app-active-timers>
+
+    <!-- Chat Log -->
+    <app-chat-log
+      [isDarkMode]="themeService.isDarkMode()"
+      [isChatCollapsed]="isChatCollapsed()"
+      [chatHistory]="chatHistory()"
+      [isTranscribing]="isTranscribing()"
+      [isThinking]="isThinking()"
+      [isBusy]="isBusy()"
+      [(typedMessage)]="typedMessage"
+      (toggleChat)="toggleChat()"
+      (openRecipe)="openRecipe($event)"
+      (submitTypedMessage)="submitTypedMessage()"
+    >
+    </app-chat-log>
+  </section>
+</main>
+
+<!-- ═══ Recipe Modal ═══ -->
+@if (currentRecipe(); as recipe) {
+  <app-recipe-modal
+    [recipe]="recipe"
+    [isDarkMode]="themeService.isDarkMode()"
+    (close)="closeRecipe()"
+  ></app-recipe-modal>
+}

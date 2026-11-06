@@ -1,0 +1,169 @@
+<header class="app-header" [ngClass]="isDark() ? 'header-dark' : 'header-light'">
+  <!-- Brand & Logo -->
+  <div class="header-left">
+    <a routerLink="/home" class="header-brand" title="Charap Home" (click)="closeMobileMenu()">
+      <div class="brand-logo">
+        <app-icon name="logo" class="logo-icon"></app-icon>
+      </div>
+      <div class="brand-text-wrap">
+        <span class="brand-title">Charap</span>
+        <span class="brand-tagline-pill" [ngClass]="isDark() ? 'pill-dark' : 'pill-light'">
+          <span class="pill-dot"></span>
+          Smart Kitchen AI
+        </span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Desktop Navigation (hidden on tablet/mobile <= 768px) -->
+  <nav class="header-nav" aria-label="Main navigation">
+    <a
+      routerLink="/home"
+      routerLinkActive="active-nav"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-tab-pill"
+      [ngClass]="isDark() ? 'nav-dark' : 'nav-light'"
+    >
+      <app-icon name="pot" class="icon-xs"></app-icon>
+      <span>Home</span>
+    </a>
+
+    <a
+      routerLink="/kitchen"
+      routerLinkActive="active-nav"
+      class="nav-tab-pill"
+      [ngClass]="isDark() ? 'nav-dark' : 'nav-light'"
+    >
+      <app-icon name="sparkles" class="icon-xs"></app-icon>
+      <span>AI Kitchen</span>
+    </a>
+  </nav>
+
+  <!-- Right Controls -->
+  <div class="header-controls">
+    <!-- User Account / Auth Status Button -->
+    <button
+      (click)="openAccountModal()"
+      class="auth-status-btn"
+      [ngClass]="isDark() ? 'auth-btn-dark' : 'auth-btn-light'"
+      title="Account & Session"
+      type="button"
+    >
+      <ng-container *ngIf="authService.currentUser() as user; else guestBtn">
+        <img
+          *ngIf="user.avatarUrl; else avatarFallback"
+          [src]="user.avatarUrl"
+          class="header-avatar-img"
+          alt="Avatar"
+        />
+        <ng-template #avatarFallback>
+          <div class="header-avatar-fallback">
+            {{ user.name.charAt(0).toUpperCase() }}
+          </div>
+        </ng-template>
+        <span class="header-user-name">{{ user.name.split(' ')[0] }}</span>
+      </ng-container>
+
+      <ng-template #guestBtn>
+        <app-icon name="user" class="icon-xs"></app-icon>
+        <span class="guest-pill-text">Sign In</span>
+      </ng-template>
+    </button>
+
+    <!-- Theme Toggle Button -->
+    <button
+      (click)="handleThemeToggle()"
+      class="theme-btn"
+      [ngClass]="isDark() ? 'theme-btn-dark' : 'theme-btn-light'"
+      title="Toggle Theme"
+      aria-label="Toggle light/dark mode"
+      type="button"
+    >
+      <app-icon [name]="isDark() ? 'sun' : 'moon'" class="icon-sm"></app-icon>
+    </button>
+
+    <!-- Mobile Hamburger Menu Toggle Button -->
+    <button
+      class="hamburger-btn"
+      [class.hamburger-active]="mobileMenuOpen()"
+      [ngClass]="isDark() ? 'hamburger-dark' : 'hamburger-light'"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      aria-label="Toggle mobile menu"
+      type="button"
+    >
+      <span class="ham-line line-1"></span>
+      <span class="ham-line line-2"></span>
+      <span class="ham-line line-3"></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Navigation Dropdown Drawer -->
+<div
+  class="mobile-drawer"
+  [class.drawer-open]="mobileMenuOpen()"
+  [ngClass]="isDark() ? 'drawer-dark' : 'drawer-light'"
+  role="region"
+  aria-label="Mobile Navigation Drawer"
+>
+  <div class="drawer-content">
+    <nav class="drawer-nav-list">
+      <a
+        routerLink="/home"
+        routerLinkActive="drawer-link-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="drawer-nav-item"
+        (click)="closeMobileMenu()"
+      >
+        <div class="drawer-icon-box home-icon-box">
+          <app-icon name="pot" class="drawer-icon"></app-icon>
+        </div>
+        <div class="drawer-item-text">
+          <span class="drawer-item-title">Home</span>
+          <span class="drawer-item-sub">Discover Heritage Recipes</span>
+        </div>
+        <span class="drawer-arrow">›</span>
+      </a>
+
+      <a
+        routerLink="/kitchen"
+        routerLinkActive="drawer-link-active"
+        class="drawer-nav-item"
+        (click)="closeMobileMenu()"
+      >
+        <div class="drawer-icon-box kitchen-icon-box">
+          <app-icon name="sparkles" class="drawer-icon"></app-icon>
+        </div>
+        <div class="drawer-item-text">
+          <span class="drawer-item-title">AI Kitchen</span>
+          <span class="drawer-item-sub">Voice Guidance &amp; Nutrients</span>
+        </div>
+        <span class="drawer-arrow">›</span>
+      </a>
+    </nav>
+
+    <!-- Drawer Footer Actions -->
+    <div class="drawer-footer">
+      <button class="drawer-auth-btn" (click)="openAccountModal()" type="button">
+        <app-icon name="user" class="icon-xs"></app-icon>
+        <span>{{
+          authService.currentUser() ? 'Manage Profile & Preferences' : 'Sign In to Charap'
+        }}</span>
+      </button>
+
+      <div class="drawer-badge-info">
+        <span class="dot-online"></span>
+        <span>13 Heritage Cuisines · AI Cooking Assistant</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop Overlay for Mobile Drawer -->
+<div
+  class="mobile-backdrop"
+  [class.backdrop-open]="mobileMenuOpen()"
+  (click)="closeMobileMenu()"
+  aria-hidden="true"
+></div>

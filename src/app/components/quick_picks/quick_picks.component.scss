@@ -1,0 +1,209 @@
+:host {
+  display: block;
+}
+
+// ─── Quick Prompts ───────────────────────────────────────────
+
+.prompts-card {
+  padding: 18px 16px 14px;
+}
+
+.prompts-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+// Collapse row (header row that wraps eyebrow + line + toggle btn)
+.prompts-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 0;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 12px;
+}
+
+// List wrapper (shown when not collapsed)
+.prompts-list-wrap {
+  padding: 0 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prompts-eyebrow {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  flex-shrink: 0;
+
+  &.eyebrow-dark {
+    color: rgba(255, 180, 100, 0.65);
+  }
+  &.eyebrow-light {
+    color: rgba(160, 80, 20, 0.7);
+  }
+}
+
+.eyebrow-line {
+  flex: 1;
+  height: 1px;
+
+  &.eyebrow-line-dark {
+    background: rgba(255, 140, 66, 0.1);
+  }
+  &.eyebrow-line-light {
+    background: rgba(91, 68, 48, 0.15);
+  }
+}
+
+// Collapse toggle button (chevron btn in header)
+.collapse-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  &.toggle-dark {
+    border-color: rgba(255, 140, 66, 0.14);
+    color: rgba(255, 180, 100, 0.5);
+
+    &:hover {
+      background: rgba(255, 140, 66, 0.08);
+      border-color: rgba(255, 140, 66, 0.25);
+      color: #ffb347;
+    }
+  }
+  &.toggle-light {
+    border-color: rgba(180, 100, 30, 0.18);
+    color: rgba(140, 70, 15, 0.55);
+
+    &:hover {
+      background: rgba(180, 100, 30, 0.07);
+      border-color: rgba(180, 100, 30, 0.3);
+      color: #7a4520;
+    }
+  }
+}
+
+// Chevron icon inside the toggle button
+.chevron-icon-sm {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.rotated {
+    transform: rotate(-90deg);
+  }
+}
+
+.prompts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prompt-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 11px;
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.prompt-btn-dark {
+    background: rgba(255, 140, 66, 0.04);
+    border-color: rgba(255, 140, 66, 0.08);
+    color: #c8a96e;
+
+    &:hover {
+      background: rgba(255, 140, 66, 0.09);
+      border-color: rgba(255, 140, 66, 0.2);
+      color: #ffd49a;
+      transform: translateX(4px);
+
+      .prompt-arrow,
+      .prompt-arrow-right {
+        opacity: 1;
+        transform: rotate(-90deg) translateX(2px);
+      }
+    }
+  }
+  &.prompt-btn-light {
+    background: rgba(220, 86, 26, 0.04);
+    border-color: rgba(200, 100, 30, 0.12);
+    color: #6b3a12;
+
+    &:hover {
+      background: rgba(220, 86, 26, 0.08);
+      border-color: rgba(200, 100, 30, 0.25);
+      color: #4a2200;
+      transform: translateX(4px);
+
+      .prompt-arrow,
+      .prompt-arrow-right {
+        opacity: 1;
+        transform: rotate(-90deg) translateX(2px);
+      }
+    }
+  }
+
+  .prompt-icon {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    opacity: 0.65;
+  }
+  .prompt-label {
+    flex: 1;
+  }
+  .prompt-arrow {
+    width: 12px;
+    height: 12px;
+    opacity: 0.25;
+    transition: all 0.22s ease;
+    flex-shrink: 0;
+  }
+}
+
+// Arrow icon at end of each prompt row (chevron-down rotated to point right)
+.prompt-arrow-right {
+  width: 12px;
+  height: 12px;
+  opacity: 0.25;
+  flex-shrink: 0;
+  transition: all 0.22s ease;
+  transform: rotate(-90deg);
+}
+
+.prompt-index {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
+
+  &.prompt-index-dark {
+    color: rgba(255, 140, 66, 0.4);
+  }
+  &.prompt-index-light {
+    color: rgba(200, 100, 30, 0.4);
+  }
+}
